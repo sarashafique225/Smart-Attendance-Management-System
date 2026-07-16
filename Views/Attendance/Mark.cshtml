@@ -1,0 +1,242 @@
+﻿@model List<SAMS.Models.Entities.Student>
+@{
+    ViewData["Title"] = "Mark Attendance";
+}
+
+<h4 class="mb-3">
+    <i class="bi bi-calendar-check text-primary me-2"></i>Mark Attendance
+</h4>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body py-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold mb-1">Department</label>
+                <select id="attDept" class="form-select form-select-sm"
+                        onchange="onDeptChange()">
+                    <option value="0">-- All Departments --</option>
+                    @foreach (var d in ViewBag.Departments
+                                        as List<SAMS.Models.Entities.Department>)
+                    {
+                        <option value="@d.DeptID"
+                                selected="@(ViewBag.SelectedDept == d.DeptID
+                                                                            ? "selected" : null)">
+                        @d.DeptName
+                    </option>
+                                        }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold mb-1">Semester</label>
+                <select id="attSem" class="form-select form-select-sm">
+                    <option value="0">-- All --</option>
+                    @for (int sem = 1; sem <= 8; sem++)
+                    {
+                        <option value="@sem"
+                                selected="@(ViewBag.SelectedSemester == sem
+                                                                            ? "selected" : null)">
+                        Semester @sem
+                    </option>
+                                        }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold mb-1">
+                    Course / Subject <span class="text-danger">*</span>
+                </label>
+                <select id="attCourse" class="form-select form-select-sm">
+                    <option value="">-- Select Department First --</option>
+                    @foreach (var c in ViewBag.Courses
+                                        as List<SAMS.Models.Entities.Course>)
+                    {
+                        <option value="@c.CourseID"
+                                selected="@(ViewBag.CourseId == c.CourseID
+                                                                            ? "selected" : null)">
+                        @c.CourseName (@c.CourseCode)
+                    </option>
+                                        }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold mb-1">Session Date</label>
+                <input type="date" id="sessionDate" class="form-control form-control-sm"
+                       value="@ViewBag.Date" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-sm w-100"
+                        onclick="filterStudents()">
+                    <i class="bi bi-funnel me-1"></i>Load Students
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow" id="attendanceCard">
+    <div class="card-header bg-primary text-white
+                d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-check me-2"></i>Student Attendance List</span>
+        <div>
+            <button class="btn btn-sm btn-success me-2"
+                    onclick="markAll('Present')">
+                ✅ Mark All Present
+            </button>
+            <button class="btn btn-sm btn-danger"
+                    onclick="markAll('Absent')">
+                ❌ Mark All Absent
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>Reg No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th class="text-center">Present</th>
+                    <th class="text-center">Absent</th>
+                    <th class="text-center">Leave</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceBody">
+                @{
+                    int rowNum = 1;
+                }
+                @foreach (var st in Model.OrderBy(x => x.RegNo))
+                {
+                    <tr>
+                        <td>@rowNum++</td>
+                        <td><span class="badge bg-secondary">@st.RegNo</span></td>
+                        <td>@st.FullName</td>
+                        <td>@st.DeptName</td>
+                        <td>Sem @st.Semester</td>
+                        <td class="text-center">
+                            <input type="radio" name="status_@st.StudentID"
+                                   value="Present" class="form-check-input" checked />
+                        </td>
+                        <td class="text-center">
+                            <input type="radio" name="status_@st.StudentID"
+                                   value="Absent" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                            <input type="radio" name="status_@st.StudentID"
+                                   value="Leave" class="form-check-input" />
+                        </td>
+                        <td>
+                            <input type="text" id="remarks_@st.StudentID"
+                                   class="form-control form-control-sm"
+                                   placeholder="Optional" />
+                        </td>
+                        <input type="hidden" class="student-id" value="@st.StudentID" />
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr id="emptyRow">
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            Select Department, Semester and Course then click Load Students.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary px-4" onclick="saveAttendance()">
+            <i class="bi bi-save me-2"></i>Save Attendance
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function onDeptChange() {
+            const deptID = document.getElementById('attDept').value;
+            const dd = document.getElementById('attCourse');
+            dd.innerHTML = '<option value="">Loading courses...</option>';
+
+            if (!deptID || deptID == 0) {
+                dd.innerHTML = '<option value="">-- Select Department First --</option>';
+                return;
+            }
+
+            fetch('/Student/GetCourses?deptID=' + deptID)
+                .then(r => r.json())
+                .then(courses => {
+                    dd.innerHTML = '<option value="">-- Select Course --</option>';
+                    courses.forEach(c => {
+                        dd.innerHTML +=
+                            `<option value="${c.courseID}">
+                                 ${c.courseName} (${c.courseCode})
+                             </option>`;
+                    });
+                });
+        }
+
+        function filterStudents() {
+            const deptID   = document.getElementById('attDept').value;
+            const semester = document.getElementById('attSem').value;
+            const courseId = document.getElementById('attCourse').value || 1;
+            window.location.href =
+                `/Attendance/Mark?courseId=${courseId}&deptID=${deptID}&semester=${semester}`;
+        }
+
+        function markAll(status) {
+            document.querySelectorAll('input[type=radio][value=' + status + ']')
+                    .forEach(r => r.checked = true);
+        }
+
+        function saveAttendance() {
+            const courseId = document.getElementById('attCourse').value;
+            const date     = document.getElementById('sessionDate').value;
+
+            if (!courseId) { alert('Please select a course/subject first!'); return; }
+            if (!date)     { alert('Please select a session date!'); return; }
+
+            const ids = document.querySelectorAll('.student-id');
+            if (ids.length === 0) {
+                alert('No students loaded! Please select filters and click Load Students.');
+                return;
+            }
+
+            const attendances = [];
+            ids.forEach(inp => {
+                const sid    = inp.value;
+                const status = document.querySelector(
+                    `input[name='status_${sid}']:checked`)?.value || 'Absent';
+                const remarks = document.getElementById(
+                    `remarks_${sid}`)?.value || '';
+                attendances.push({ studentID: parseInt(sid), status, remarks });
+            });
+
+            fetch('/Attendance/SaveAttendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseID: parseInt(courseId),
+                    sessionDate: date,
+                    attendances: attendances
+                })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    alert('✅ Attendance saved successfully!');
+                } else {
+                    alert('❌ Error: ' + d.message);
+                }
+            })
+            .catch(e => alert('Network error: ' + e));
+        }
+
+        window.onload = function() {
+            const deptVal = document.getElementById('attDept').value;
+            if (deptVal && deptVal != '0') onDeptChange();
+        };
+    </script>
+}

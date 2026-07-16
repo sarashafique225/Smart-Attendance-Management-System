@@ -1,0 +1,143 @@
+﻿@model SAMS.Models.Entities.Student
+@{
+    ViewData["Title"] = "Add New Student";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-person-plus-fill text-success me-2"></i>Add New Student</h3>
+    <a href="/Student/Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to List
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <form method="post" asp-action="Create">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Registration Number <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="RegNo" class="form-control"
+                           placeholder="e.g. CS-2024-001" />
+                    <span asp-validation-for="RegNo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Full Name <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="FullName" class="form-control"
+                           placeholder="Student full name" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input asp-for="Email" class="form-control"
+                           placeholder="student@email.com" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Phone Number</label>
+                    <input asp-for="Phone" class="form-control"
+                           placeholder="03XXXXXXXXX" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                        Department <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="DeptID" class="form-select"
+                            id="deptDropdown" onchange="loadCourses(this.value)">
+                        <option value="">-- Select Department --</option>
+                        @foreach (var d in ViewBag.Departments
+                                                as List<SAMS.Models.Entities.Department>)
+                        {
+                            <option value="@d.DeptID">@d.DeptName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="DeptID" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                        Semester <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="Semester" class="form-select">
+                        <option value="">-- Select Semester --</option>
+                        @for (int i = 1; i <= 8; i++)
+                        {
+                            <option value="@i">Semester @i</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Semester" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                        Course / Subject <span class="text-danger">*</span>
+                    </label>
+                    <select id="courseDropdown" name="CourseID" class="form-select">
+                        <option value="">-- Select Department First --</option>
+                    </select>
+                    <small class="text-muted">Select department first to load courses</small>
+                </div>
+
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <i class="bi bi-exclamation-triangle me-1"></i>@ViewBag.Error
+                </div>
+            }
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-check-circle me-2"></i>Save Student
+                </button>
+                <a href="/Student/Index" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadCourses(deptID) {
+            const dd = document.getElementById('courseDropdown');
+            dd.innerHTML = '<option value="">Loading...</option>';
+
+            if (!deptID || deptID == '') {
+                dd.innerHTML = '<option value="">-- Select Department First --</option>';
+                return;
+            }
+
+            fetch('/Student/GetCourses?deptID=' + deptID)
+                .then(r => r.json())
+                .then(courses => {
+                    dd.innerHTML = '<option value="">-- Select Course --</option>';
+                    if (courses.length === 0) {
+                        dd.innerHTML = '<option value="">No courses found</option>';
+                        return;
+                    }
+                    courses.forEach(c => {
+                        dd.innerHTML +=
+                            `<option value="${c.courseID}">
+                                 ${c.courseName} (${c.courseCode})
+                             </option>`;
+                    });
+                })
+                .catch(() => {
+                    dd.innerHTML = '<option value="">Error loading courses</option>';
+                });
+        }
+    </script>
+}

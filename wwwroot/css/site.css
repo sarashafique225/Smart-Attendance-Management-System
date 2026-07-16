@@ -1,0 +1,59 @@
+:root {
+    --primary: #0d6efd;
+    --sidebar-width: 220px;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+}
+
+    .sidebar .nav-link {
+        border-radius: 8px;
+        margin: 2px 8px;
+        transition: all 0.3s;
+    }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(4px);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--primary);
+        }
+
+.card {
+    border-radius: 12px;
+}
+
+.stat-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+.table th {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.alert {
+    border-radius: 8px;
+}

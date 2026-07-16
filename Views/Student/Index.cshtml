@@ -1,0 +1,139 @@
+﻿@model List<SAMS.Models.Entities.Student>
+@{
+    ViewData["Title"] = "Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-people-fill text-primary me-2"></i>Student Management</h3>
+    <a href="/Student/Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i>Add New Student
+    </a>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="get" asp-action="Index" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold mb-1">Department</label>
+                <select name="deptID" class="form-select form-select-sm">
+                    <option value="0">-- All Departments --</option>
+                    @foreach (var d in ViewBag.Departments as List<SAMS.Models.Entities.Department>)
+                    {
+                        @* FIXED: Added closing tag and name variable *@
+                        <option value="@d.DeptID" selected="@(ViewBag.SelectedDept == d.DeptID ? "selected" : null)">
+                            @d.DeptName
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold mb-1">Semester</label>
+                <select name="semester" class="form-select form-select-sm">
+                    <option value="0">-- All --</option>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        <option value="@i" selected="@(ViewBag.SelectedSemester == i ? "selected" : null)">
+                            Semester @i
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+            <div class="col-md-3">
+                <input type="text" id="searchBox" class="form-control form-control-sm"
+                       placeholder="Search students..." onkeyup="filterTable()" />
+            </div>
+            <div class="col-md-2">
+                <a href="/Student/Index" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0" id="studentTable">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>Reg No</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int counter = 1;
+                }
+                @foreach (var s in Model)
+                {
+                    <tr id="row-@s.StudentID">
+                        @* FIXED: Use a cleaner variable name for the index *@
+                        <td>@(counter++)</td>
+                        <td><span class="badge bg-secondary">@s.RegNo</span></td>
+                        <td>@s.FullName</td>
+                        <td>@s.Email</td>
+                        <td>@s.DeptName</td>
+                        <td>Semester @s.Semester</td>
+                        <td>
+                            <a href="/Student/Edit/@s.StudentID"
+                               class="btn btn-warning btn-sm me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteStudent(@s.StudentID,'@s.FullName')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            No students found. Try changing the filter or add a new student.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteStudent(id, name) {
+            if (!confirm('Delete student: ' + name + '?')) return;
+            fetch('/Student/DeleteAjax', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id=' + id
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('row-' + id).remove();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+
+        function filterTable() {
+            const filter = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('#studentTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+            });
+        }
+    </script>
+}

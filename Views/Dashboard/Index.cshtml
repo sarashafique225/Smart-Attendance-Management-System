@@ -1,0 +1,117 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<h3 class="mb-4">
+    <i class="bi bi-speedometer2 text-primary me-2"></i>
+    Welcome, @ViewBag.UserName!
+    <small class="fs-6 text-muted">(@ViewBag.UserRole)</small>
+</h3>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card stat-card border-0 bg-primary text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 opacity-75">Total Students</p>
+                        <h2 class="fw-bold">@ViewBag.TotalStudents</h2>
+                    </div>
+                    <i class="bi bi-people-fill fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card border-0 bg-success text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 opacity-75">Present Today</p>
+                        <h2 class="fw-bold">@ViewBag.PresentToday</h2>
+                    </div>
+                    <i class="bi bi-check-circle-fill fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card border-0 bg-warning text-dark shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 opacity-75">Total Courses</p>
+                        <h2 class="fw-bold">@ViewBag.TotalCourses</h2>
+                    </div>
+                    <i class="bi bi-journal-bookmark-fill fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card border-0 bg-danger text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 opacity-75">Absent Today</p>
+                        <h2 class="fw-bold">@ViewBag.AbsentToday</h2>
+                    </div>
+                    <i class="bi bi-x-circle-fill fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header"><b>Weekly Attendance Overview</b></div>
+            <div class="card-body">
+                <canvas id="attendanceChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header"><b>Attendance Rate (Today)</b></div>
+            <div class="card-body">
+                <canvas id="pieChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        new Chart(document.getElementById('attendanceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Mon','Tue','Wed','Thu','Fri'],
+                datasets: [{
+                    label: 'Present',
+                    data: [45, 38, 50, 42, 30],
+                    backgroundColor: 'rgba(13,110,253,0.7)'
+                },{
+                    label: 'Absent',
+                    data: [5, 12, 0, 8, 20],
+                    backgroundColor: 'rgba(220,53,69,0.7)'
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Present','Absent','Leave'],
+                datasets: [{
+                    data: [75, 15, 10],
+                    backgroundColor: ['#198754','#dc3545','#ffc107']
+                }]
+            }
+        });
+    </script>
+}
+
