@@ -44,6 +44,26 @@ A full-stack attendance management system developed to streamline student attend
 
 ---
 
+## 📸 Project Screenshots
+
+| Login | Registration |
+|-------|--------------|
+| ![](screenshots/LoginPage.jpeg) | ![](screenshots/RegistrationPage.jpeg) |
+
+| Dashboard | Student Management |
+|-----------|--------------------|
+| ![](screenshots/DashboardOverview1.jpeg) | ![](screenshots/StudentManagement.jpeg) |
+
+| Add Student | Mark Attendance |
+|-------------|-----------------|
+| ![](screenshots/AddStudent.jpeg) | ![](screenshots/MarkAttendance.jpeg) |
+
+| Reports | Dashboard |
+|----------|-----------|
+| ![](screenshots/AttendanceReports.jpeg) | ![](screenshots/DashboardOverview2.jpeg) |
+
+---
+
 ## 🚀 Installation
 
 ```bash
