@@ -1,5 +1,5 @@
 # 🎓 Smart Attendance Management System
-A full-stack attendance management system built with ASP.NET, SQL Server, Windows Forms & C#.
+A full-stack attendance management system developed to streamline student attendance tracking, reporting, and administration using ASP.NET, C#, and SQL Server.
 
 ---
 
