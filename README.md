@@ -23,14 +23,23 @@ A full-stack attendance management system built with ASP.NET, SQL Server, Window
 ## 📋 Features
 
 ✅ Student Management
+
 ✅ Class & Subject Management
+
 ✅ Attendance Management
+
 ✅ Attendance Reports
+
 ✅ User Authentication
+
 ✅ Role-Based Access Control
+
 ✅ CRUD Operations
+
 ✅ 3-Tier Architecture
+
 ✅ Stored Procedures
+
 ✅ Responsive Interface
 
 ---
